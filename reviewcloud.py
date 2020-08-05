@@ -12,6 +12,8 @@ import argparse
 import pandas as pd 
 from functools import reduce
 import operator
+from wordcloud import WordCloud, STOPWORDS 
+import matplotlib.pyplot as plt
 
 def parse_report(path):
     """Parses the report (.csv) file , filters and generates a DataFrame"""
@@ -19,7 +21,7 @@ def parse_report(path):
     df = pd.read_csv(path, encoding="utf16")
 
     # Optional - Filter by english reviews. Word Cloud has a list of words to ignore, but only in english
-    filtered = df.loc[df['Reviewer Language'] == 'en'].copy()
+    filtered = df.loc[df['Reviewer Language'] == 'ja'].copy()
 
     # Drop rows with NaN review text
     filtered.dropna(subset = ['Review Text'], inplace=True)
@@ -29,7 +31,8 @@ def parse_report(path):
 
     # Concat the list of lists
     concat = reduce(operator.concat, words)
-    print(len(concat))
+    
+    return concat
 
 def extract_words_from_review(review):
     """Extracts the words of a given review, filters them and returns a list"""
@@ -64,11 +67,34 @@ def filter_words(word):
     else:
         return False
 
+def create_word_cloud(words):
+    """Creates a word cloud and shows it"""
+    # Create single string with words
+    all_words = " ".join(words)
+
+    # Generate WordCloud
+    wordcloud = WordCloud(width = 800, height = 800, 
+                background_color ='white', 
+                stopwords = set(STOPWORDS), 
+                min_font_size = 10).generate(all_words) 
+  
+    # plot the WordCloud image                        
+    plt.figure(figsize = (8, 8), facecolor = None) 
+    plt.imshow(wordcloud) 
+    plt.axis("off") 
+    plt.tight_layout(pad = 0)
+    plt.show() 
+
 def main():
     parser = argparse.ArgumentParser(description='Script to generate a word cloud from a Play Store review report (.csv)')
     parser.add_argument('-rp','--report-path', metavar='<Path where the report is located>', type=str, required=True)
     args = parser.parse_args()
-    parse_report(args.report_path)
+
+    # Obtain all words in the reviews
+    words = parse_report(args.report_path)
+
+    # Create and plot the word cloud
+    create_word_cloud(words)
 
 if __name__ == '__main__':
     main()
