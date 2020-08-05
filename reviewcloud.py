@@ -6,6 +6,8 @@
     Date created: 08/05/2020
 '''
 
+import string
+import emoji
 import argparse
 import pandas as pd 
 
@@ -22,17 +24,44 @@ def parse_report(path):
 
     # Extract words of every review in the report
     words = extract_words_from_report(filtered)  
-    # print(words)
+    print(words)
 
 def extract_words_from_report(df):
     """Extracts the words of each review in the whole report and returns a list"""
     return [extract_words_from_review(review) for review in df['Review Text']]
 
-
 def extract_words_from_review(review):
     """Extracts the words of a given review, filters them and returns a list"""
-    filteredWords = review.split()
-    print(filteredWords)
+    # Get the list of words using spacing as separation
+    splitWords = review.split()
+
+    # Filter out words we don't want to show
+    filteredWords = list(filter(filter_words, splitWords))
+
+    # Clean up the words removing extra characters
+    cleanWords = [clean_words(word) for word in filteredWords]
+
+    return cleanWords
+
+def clean_words(word):
+    """Cleans up the words removing extra characters like punctuations, emojis, etc """    
+    # Remove punctuation symbols
+    punctuation_free = word.translate(str.maketrans('', '', string.punctuation))
+
+    # Remove emojis
+    emoji_free = emoji.get_emoji_regexp().sub(u'', punctuation_free)
+
+    # Turn into lower caps
+    lower = emoji_free.lower()
+
+    return lower
+
+def filter_words(word):
+    """Applies some filtering and discard words based on certain rules"""
+    if (len(word) > 1):
+        return True
+    else:
+        return False
 
 def main():
     parser = argparse.ArgumentParser(description='Script to generate a word cloud from a Play Store review report (.csv)')
