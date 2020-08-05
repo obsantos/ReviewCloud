@@ -15,19 +15,20 @@ import operator
 from wordcloud import WordCloud, STOPWORDS 
 import matplotlib.pyplot as plt
 
-def parse_report(path):
+def parse_report(path, language):
     """Parses the report (.csv) file , filters and generates a DataFrame"""
     # Read the report in utf16
-    df = pd.read_csv(path, encoding="utf16")
+    report = pd.read_csv(path, encoding="utf16", dtype=object)
 
-    # Optional - Filter by english reviews. Word Cloud has a list of words to ignore, but only in english
-    filtered = df.loc[df['Reviewer Language'] == 'ja'].copy()
+    # Optional - Filter by language. Word Cloud has a list of words to ignore, but only in english
+    if language is not None:
+        report = report.loc[report['Reviewer Language'] == language].copy()
 
     # Drop rows with NaN review text
-    filtered.dropna(subset = ['Review Text'], inplace=True)
+    report.dropna(subset = ['Review Text'], inplace=True)
 
     # Extract words of every review in the report
-    words = [extract_words_from_review(review) for review in filtered['Review Text']]
+    words = [extract_words_from_review(review) for review in report['Review Text']]
 
     # Concat the list of lists
     concat = reduce(operator.concat, words)
@@ -80,18 +81,19 @@ def create_word_cloud(words):
   
     # plot the WordCloud image                        
     plt.figure(figsize = (8, 8), facecolor = None) 
-    plt.imshow(wordcloud) 
+    plt.imshow(wordcloud, interpolation="bilinear") 
     plt.axis("off") 
     plt.tight_layout(pad = 0)
     plt.show() 
 
 def main():
     parser = argparse.ArgumentParser(description='Script to generate a word cloud from a Play Store review report (.csv)')
-    parser.add_argument('-rp','--report-path', metavar='<Path where the report is located>', type=str, required=True)
+    parser.add_argument('-rp','--report-path', help='<Path where the report is located>', type=str, required=True)
+    parser.add_argument('-lang','--language', help='<Optional language code to filter reviews (i.e "en", "es"...)>', type=str, required=False)
     args = parser.parse_args()
 
     # Obtain all words in the reviews
-    words = parse_report(args.report_path)
+    words = parse_report(args.report_path, args.language)
 
     # Create and plot the word cloud
     create_word_cloud(words)
