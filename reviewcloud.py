@@ -18,35 +18,31 @@ def parse_report(path):
     # Read the report in utf16
     df = pd.read_csv(path, encoding="utf16")
 
-    # Optional - Filter by english reviews. Word Count has a list of words to ignore, but only in english
+    # Optional - Filter by english reviews. Word Cloud has a list of words to ignore, but only in english
     filtered = df.loc[df['Reviewer Language'] == 'en'].copy()
 
     # Drop rows with NaN review text
     filtered.dropna(subset = ['Review Text'], inplace=True)
 
     # Extract words of every review in the report
-    words = extract_words_from_report(filtered)  
+    words = [extract_words_from_review(review) for review in filtered['Review Text']]
 
     # Concat the list of lists
     concat = reduce(operator.concat, words)
-    print(concat)
-
-def extract_words_from_report(df):
-    """Extracts the words of each review in the whole report and returns a list"""
-    return [extract_words_from_review(review) for review in df['Review Text']]
+    print(len(concat))
 
 def extract_words_from_review(review):
     """Extracts the words of a given review, filters them and returns a list"""
     # Get the list of words using spacing as separation
     splitWords = review.split()
 
-    # Filter out words we don't want to show
-    filteredWords = list(filter(filter_words, splitWords))
-
     # Clean up the words removing extra characters
-    cleanWords = [clean_words(word) for word in filteredWords]
+    cleanWords = [clean_words(word) for word in splitWords]
 
-    return cleanWords
+    # Filter out words we don't want to show
+    filteredWords = list(filter(filter_words, cleanWords))
+
+    return filteredWords
 
 def clean_words(word):
     """Cleans up the words removing extra characters like punctuations, emojis, etc """    
