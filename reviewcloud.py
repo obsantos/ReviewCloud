@@ -6,7 +6,6 @@
     Date created: 08/05/2020
 '''
 
-import io
 import argparse
 import pandas as pd 
 
@@ -21,12 +20,19 @@ def parse_report(path):
     # Drop rows with NaN review text
     filtered.dropna(subset = ['Review Text'], inplace=True)
 
-    # Extract words of each review
-    extract_words(filtered)
-    
+    # Extract words of every review in the report
+    words = extract_words_from_report(filtered)  
+    # print(words)
 
-def extract_words(df):
-    print(df['Review Text'])
+def extract_words_from_report(df):
+    """Extracts the words of each review in the whole report and returns a list"""
+    return [extract_words_from_review(review) for review in df['Review Text']]
+
+
+def extract_words_from_review(review):
+    """Extracts the words of a given review, filters them and returns a list"""
+    filteredWords = review.split()
+    print(filteredWords)
 
 def main():
     parser = argparse.ArgumentParser(description='Script to generate a word cloud from a Play Store review report (.csv)')
