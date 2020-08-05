@@ -10,6 +10,8 @@ import string
 import emoji
 import argparse
 import pandas as pd 
+from functools import reduce
+import operator
 
 def parse_report(path):
     """Parses the report (.csv) file , filters and generates a DataFrame"""
@@ -24,7 +26,10 @@ def parse_report(path):
 
     # Extract words of every review in the report
     words = extract_words_from_report(filtered)  
-    print(words)
+
+    # Concat the list of lists
+    concat = reduce(operator.concat, words)
+    print(concat)
 
 def extract_words_from_report(df):
     """Extracts the words of each review in the whole report and returns a list"""
