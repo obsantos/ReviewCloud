@@ -14,6 +14,10 @@ from functools import reduce
 import operator
 from wordcloud import WordCloud, STOPWORDS 
 import matplotlib.pyplot as plt
+import multidict as multidict
+import re
+
+stopwords = set(STOPWORDS)
 
 def parse_report(path, language):
     """Parses the report (.csv) file , filters and generates a DataFrame"""
@@ -68,20 +72,38 @@ def filter_words(word):
     else:
         return False
 
-def create_word_cloud(words, output):
-    """Creates a word cloud and shows it"""
-    # Create single string with words
-    all_words = " ".join(words)
+def getFrequencyDictForText(sentence):
+    """Creates a multidict with the words and their frequency"""
+    fullTermsDict = multidict.MultiDict()
+    tmpDict = {}
 
-    # Generate WordCloud
+    # making dict for counting frequencies
+    for text in sentence.split(" "):
+        if text in stopwords:
+            continue
+        val = tmpDict.get(text, 0)
+        tmpDict[text.lower()] = val + 1
+    for key in tmpDict:
+        fullTermsDict.add(key, tmpDict[key])
+    return fullTermsDict
+
+def create_word_cloud(words, output, unique):
+    """Creates a word cloud and shows it"""
+    # Create WordCloud instance
     wordcloud = WordCloud(width = 800, height = 800, 
                 background_color ='white', 
-                stopwords = set(STOPWORDS), 
-                min_font_size = 10).generate(all_words) 
+                stopwords = stopwords, 
+                min_font_size = 10)
+
+    # Generate the word cloud based on mode
+    if unique:         
+        wordcloud.generate_from_frequencies(getFrequencyDictForText(" ".join(words))) 
+    else:
+        wordcloud.generate(" ".join(words))
   
     # plot the WordCloud image                        
     plt.figure(figsize = (8, 8), facecolor = None) 
-    plt.imshow(wordcloud, interpolation="bilinear") 
+    plt.imshow(wordcloud) 
     plt.axis("off") 
     plt.tight_layout(pad = 0)
 
@@ -95,13 +117,14 @@ def main():
     parser.add_argument('-rp','--report-path', help='<Path where the report is located>', type=str, required=True)
     parser.add_argument('-lang','--language', help='<Optional language code to filter reviews (i.e "en", "es"...)>', type=str, required=False)
     parser.add_argument('-out','--output', help='<Path to the file where to save word cloud>', type=str, required=False)
+    parser.add_argument('-uniq','--unique', help='Use high frequency unique words. If omitted it uses high frequency words ignoring singular/plurals (i.e "car" and "cars" count as same word)', action='store_true', required=False)
     args = parser.parse_args()
 
     # Obtain all words in the reviews
     words = parse_report(args.report_path, args.language)
 
     # Create and plot the word cloud
-    create_word_cloud(words, args.output)
+    create_word_cloud(words, args.output, args.unique)
 
 if __name__ == '__main__':
     main()
