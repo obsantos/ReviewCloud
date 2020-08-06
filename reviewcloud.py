@@ -72,7 +72,7 @@ def filter_words(word):
     else:
         return False
 
-def getFrequencyDictForText(sentence):
+def get_frequency_dictionary(sentence):
     """Creates a multidict with the words and their frequency"""
     fullTermsDict = multidict.MultiDict()
     tmpDict = {}
@@ -97,7 +97,7 @@ def create_word_cloud(words, output, unique):
 
     # Generate the word cloud based on mode
     if unique:         
-        wordcloud.generate_from_frequencies(getFrequencyDictForText(" ".join(words))) 
+        wordcloud.generate_from_frequencies(get_frequency_dictionary(" ".join(words))) 
     else:
         wordcloud.generate(" ".join(words))
   

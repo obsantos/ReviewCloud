@@ -1,6 +1,8 @@
 # ReviewCloud
 Python script that generates a word cloud using your app's reviews report from Google Play Developer console. Allows filtering by review language.
 
+Reports can be found in the Google Play Developer console, User feedback section and Reviews. The format available is `.csv` and thats exactly what you need.
+
 ## Instalation
 
 Certain modules need to be installed before using:
