@@ -68,7 +68,7 @@ def filter_words(word):
     else:
         return False
 
-def create_word_cloud(words):
+def create_word_cloud(words, output):
     """Creates a word cloud and shows it"""
     # Create single string with words
     all_words = " ".join(words)
@@ -84,19 +84,24 @@ def create_word_cloud(words):
     plt.imshow(wordcloud, interpolation="bilinear") 
     plt.axis("off") 
     plt.tight_layout(pad = 0)
-    plt.show() 
+
+    if output is not None:
+        plt.savefig(output)
+    else:        
+        plt.show()
 
 def main():
     parser = argparse.ArgumentParser(description='Script to generate a word cloud from a Play Store review report (.csv)')
     parser.add_argument('-rp','--report-path', help='<Path where the report is located>', type=str, required=True)
     parser.add_argument('-lang','--language', help='<Optional language code to filter reviews (i.e "en", "es"...)>', type=str, required=False)
+    parser.add_argument('-out','--output', help='<Path to the file where to save word cloud>', type=str, required=False)
     args = parser.parse_args()
 
     # Obtain all words in the reviews
     words = parse_report(args.report_path, args.language)
 
     # Create and plot the word cloud
-    create_word_cloud(words)
+    create_word_cloud(words, args.output)
 
 if __name__ == '__main__':
     main()
