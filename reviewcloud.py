@@ -114,10 +114,10 @@ def create_word_cloud(words, output, unique):
 
 def main():
     parser = argparse.ArgumentParser(description='Script to generate a word cloud from a Play Store review report (.csv)')
-    parser.add_argument('-rp','--report-path', help='<Path where the report is located>', type=str, required=True)
-    parser.add_argument('-lang','--language', help='<Optional language code to filter reviews (i.e "en", "es"...)>', type=str, required=False)
-    parser.add_argument('-out','--output', help='<Path to the file where to save word cloud>', type=str, required=False)
-    parser.add_argument('-uniq','--unique', help='Use high frequency unique words. If omitted it uses high frequency words ignoring singular/plurals (i.e "car" and "cars" count as same word)', action='store_true', required=False)
+    parser.add_argument('-rp','--report-path', help='Path where the comma separated report (.csv) is located', type=str, required=True)
+    parser.add_argument('-lang','--language', help='Optional. Language code to filter reviews (i.e "en", "es"...)', type=str, required=False)
+    parser.add_argument('-out','--output', help='Optional. Path to the file where to save word cloud', type=str, required=False)
+    parser.add_argument('-uniq','--unique', help='Optional. Use high frequency unique words. If omitted it uses high frequency words ignoring singular/plurals (i.e "car" and "cars" count as same word)', action='store_true', required=False)
     args = parser.parse_args()
 
     # Obtain all words in the reviews
