@@ -5,13 +5,9 @@ Reports can be found in the Google Play Developer console, User feedback section
 
 ## Instalation
 
-Certain modules need to be installed before using:
+To install dependencies needed run:
 
-    pip3 install wordcloud
-    pip3 install matplotlib
-    pip3 install pandas
-    pip3 install emoji
-    pip3 install multidict
+    pip3 install -r requirements.txt
 
 ## Usage
 
